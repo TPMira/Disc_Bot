@@ -198,14 +198,14 @@ class FeedbackModal(discord.ui.Modal, title='Solana Comprar/Renovar VIP'):
                     user_file_name = f'user_{user_id}Pagamento.json'
                     with open(user_file_name, 'r') as file:
                         data = json.load(file)
-                        hash_r = data.get('hash', '')
+                        
                 except:
                     pass
                     
 
-                if hash_r == None or hash != hash_r:
+                if hash not in data:
 
-                    if source == wallet and amount_true >= (70 - discount) and destination == f'{wallet_destination}':
+                    if source == wallet and amount_true >= (70 - discount) and destination == f'{wallet_destination}' and (token_symbol =='USDC' or token_symbol == 'USDT'):
                         if user:
                             role = interaction.guild.get_role(role_id)
                             await user.add_roles(role)
@@ -219,14 +219,9 @@ class FeedbackModal(discord.ui.Modal, title='Solana Comprar/Renovar VIP'):
 
                             await channel.send(embed=embed)
 
+                            data.append(hash)
+
                             with open(f'user_{user_id}Pagamento.json', 'w') as file:
-                                data = {
-                                    "user_name": user_name,
-                                    "wallet": self.fb_title.value,
-                                    "hash": self.message.value,
-                                    "data_envio_str": data_envio_str,
-                                    "data_expiracao_str": data_expiracao_str
-                                }
                                 json.dump(data, file, indent=2)
 
                             user_file_name = f'user_{user_id}.json'
@@ -263,6 +258,9 @@ class FeedbackModal(discord.ui.Modal, title='Solana Comprar/Renovar VIP'):
                         if destination != f'{wallet_destination}':
                             print(f"Erro: Wallet de destino {shortened_destination} não é igual a '{wallet_destination}'")
                             errors.append(f"Erro: Wallet de destino {shortened_destination} não é igual a '{wallet_destination}'")
+
+                        if token_symbol != 'USDC':
+                            errors.append(f'Erro: Token diferente de USDC ou USDT')
 
                         if errors:
                             await interaction.response.send_message(errors, ephemeral=True)
@@ -333,13 +331,7 @@ class CadastroModal(discord.ui.Modal, title='Cadastro de Novo Usuario'):
                 json.dump(data, file, indent=2)
             
             with open(f'user_{user_id}Pagamento.json', 'w') as file:
-                data = {
-                    "user_name": user_name,
-                    "wallet": None,
-                    "hash": None,
-                    "data_envio_str": None,
-                    "data_expiracao_str": None,
-                }
+                data = []
                 json.dump(data, file, indent=2)
 
             await interaction.response.send_message(f'Cadastro feito com Sucesso!', ephemeral=True)

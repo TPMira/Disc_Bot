@@ -55,9 +55,8 @@ async def verificar_e_remover_cargo():
                                         
                         vip_date = datetime.strptime(vip, '%d/%m/%Y')
                         
-                        # Verificar se a data de expiração é anterior à data atual
                         if vip_date < current_date:
-                            # A data de expiração passou, remova o cargo aqui
+                            
                             role = discord.utils.get(guild.roles, id=role_id)
                             if role is not None:
                                 await member.remove_roles(role)
